@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import fisher_exact
 
 
-def print_fisher_exact_results(table):
+def print_fisher_exact_results(header, table):
     oddsratio, pvalue = fisher_exact(table)
     if pvalue < 0.05:
         pvalue = "< 0.05"
@@ -12,7 +12,7 @@ def print_fisher_exact_results(table):
         pvalue = round(pvalue, 2)
         pvalue = f"= {pvalue}"
     oddsratio = round(oddsratio, 2)
-    print(f"OR = {oddsratio}, p {pvalue}")
+    print(f"{header.title()}: OR = {oddsratio}, p {pvalue}")
     return
 
 
@@ -27,7 +27,7 @@ PRIMARY OUTCOME
     -BCC|    69    |   823    |
         +----------+----------+
 """
-print_fisher_exact_results(np.array([
+print_fisher_exact_results("rate of GPC contamination", np.array([
     [64, 266],
     [69, 823]
 ]))
@@ -45,7 +45,7 @@ PRIMARY OUTCOME
     EXAC|    50          100    |
         +-----------+-----------+
 """
-print_fisher_exact_results(np.array([
+print_fisher_exact_results("CHF exacerbations", np.array([
     [12, 27],
     [50, 100]
 ]))
@@ -60,7 +60,10 @@ CV DEATH+-----------+-----------+
     NO  |    62     |    127    |
         +-----------+-----------+
 """
-
+print_fisher_exact_results("cardiovascular death", np.array([
+    [0, 2],
+    [62, 117]
+]))
 """
 SECONDARY - OVERALL DEATH
         +-----------+-----------+
@@ -71,5 +74,8 @@ DEATH   +-----------+-----------+
     NO  |    62     |    127    |
         +-----------+-----------+
 """
-
+print_fisher_exact_results("death from any cause", np.array([
+    [0, 19],
+    [62, 127]
+]))
 ### SEAN ###
