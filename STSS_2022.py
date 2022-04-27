@@ -6,13 +6,7 @@ from scipy.stats import fisher_exact
 
 def print_fisher_exact_results(header, table):
     oddsratio, pvalue = fisher_exact(table)
-    if pvalue < 0.05:
-        pvalue = "< 0.05"
-    else:
-        pvalue = round(pvalue, 2)
-        pvalue = f"= {pvalue}"
-    oddsratio = round(oddsratio, 2)
-    print(f"{header.title()}: OR = {oddsratio}, p {pvalue}")
+    print(f"{header.title()}: OR = {oddsratio}, p = {pvalue}")
     return
 
 
