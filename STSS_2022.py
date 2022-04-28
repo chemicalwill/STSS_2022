@@ -33,19 +33,22 @@ def get_fisher_exact_results_as_dict(a, b, c, d):
         [a, b],
         [c, d]
     ])
+
+    if any([a == 0, b == 0, c == 0, d == 0]):
+        a += 0.5
+        b += 0.5
+        c += 0.5
+        d += 0.5
+
     odds_ratio, pvalue = stats.fisher_exact(table)
     odds_ratio = round(odds_ratio, 2)
     pvalue = round_to_3_decimal_or_sci_places(pvalue)
     
-    try:
-        lowerci = np.exp(np.log(odds_ratio) - 1.96 * sqrt(1/a + 1/b + 1/c + 1/d))
-        upperci = np.exp(np.log(odds_ratio) + 1.96 * sqrt(1/a + 1/b + 1/c + 1/d))
-        lowerci, upperci = round(lowerci, 2), round(upperci, 2)
-    except ZeroDivisionError:
-        # TODO make these 2 lines build a dict rather than make 2 different ones
-        return {"OR": odds_ratio, "p-value": pvalue}
-    else:
-        return {"OR": odds_ratio, "p-value": pvalue, "95% CI": f"{lowerci} - {upperci}"}
+    lowerci = np.exp(np.log(odds_ratio) - 1.96 * sqrt(1/a + 1/b + 1/c + 1/d))
+    upperci = np.exp(np.log(odds_ratio) + 1.96 * sqrt(1/a + 1/b + 1/c + 1/d))
+    lowerci, upperci = round(lowerci, 2), round(upperci, 2)
+
+    return {"OR": odds_ratio, "p-value": pvalue, "95% CI": f"{lowerci} - {upperci}"}
         
 
 def extract_2_groups_from_df(df, group_col, value):
@@ -59,6 +62,19 @@ def get_ag_results_as_dict(df, group_col, value):
     group1, group2 = extract_2_groups_from_df(df, group_col, value)
     # FIXME would like to figure out how to split up results
     return {"Alexander Govern results": stats.alexandergovern(group1, group2)}
+
+
+def get_barnard_exact_results_as_dict(a, b, c, d):
+    table = np.array([
+        [a, b],
+        [c, d]
+    ])
+    
+    ber = stats.barnard_exact(table)
+    stat = round(ber.statistic, 3)
+    p = round_to_3_decimal_or_sci_places(ber.pvalue)
+
+    return {"Barnard Exact statistic": stat, "p-value": p}
 
 
 def get_kruskall_wallis_results_as_dict(df, group_col, value):
@@ -88,38 +104,37 @@ def write_out_results(fp, residents):
             for name, results in resident.items():
                 f.write(name.title())
                 for endpoint, result in results.items():
-                    f.write(f"\n - {endpoint}: ")
+                    f.write(f"\n - {endpoint}:")
                     for stat, value in result.items():
-                        f.write(f" {stat}: {value}, ")
+                        f.write(f" {stat} {value},")
                 f.write("\n\n")
-        
-        # TODO remove the trailing commas...
+
     return
 
 
 def seth():
     """
     PRIMARY OUTCOME - RATE OF GP CONTAM.
-            +----------+----------+
-            | COVID19+ | COVID19- | 
-            +----------+----------+   
-        +BCC|    64    |   266    |
-            +----------+----------+
-        -BCC|    69    |   823    |
-            +----------+----------+
+            +------+------+
+            | BCC- | BCC+ | 
+            +------+------+   
+    COVID19+|  69  |  64  |
+            +------+------+
+    COVID19-| 823  | 266  |
+            +------+------+
 
     SECONDARY OUTCOME - RATE OF ECHO
-            +----------+----------+
-            | COVID19+ | COVID19- | 
-            +----------+----------+
-        ECHO|    1     |   17     |
-            +----------+----------+
-        NONE|    63    |   249    |
-            +----------+----------+
+            +-------+-------+
+            | ECHO- | ECHO+ | 
+            +-------+-------+
+    COVID19+|   63  |   1   |
+            +-------+-------+
+    COVID19-|  249  |  17   |
+            +-------+-------+
 
     """
-    rate_of_gp_contam = get_fisher_exact_results_as_dict(64, 266, 69, 823)
-    rate_of_echo = get_fisher_exact_results_as_dict(1, 17, 63, 249)
+    rate_of_gp_contam = get_fisher_exact_results_as_dict(69, 64, 823, 266) # FIXME
+    rate_of_echo = get_fisher_exact_results_as_dict(63, 1, 249, 17)
     df = pd.read_csv('seth_data_cleaned.csv')
     check_for_normalcy(df, 0.05, "length_ofstay")
     length_of_stay = get_kruskall_wallis_results_as_dict(df, "covid_positive", "length_ofstay")
@@ -135,35 +150,36 @@ def seth():
 def sarah():
     """ 
     PRIMARY OUTCOME - CHF EXAC
-            +-----------+-----------+
-            | SGLT2+S/V | S/V ALONE |
-            +-----------+-----------+
-        EXAC|    12          27     |
-            +-----------+-----------+
-        NONE|    50          100    |
-            +-----------+-----------+
+            +---------+---------+
+            | NO EXAC |  EXACS  |
+            +---------+---------+
+    COMBO TX|    50   |    12   |
+            +---------+---------+
+    SGLT2 TX|   100   |    27   |
+            +---------+---------+
 
     SECONDARY OUTCOME - CV DEATH
-            +-----------+-----------+
-            | SGLT2+S/V | S/V ALONE |
-            +-----------+-----------+
-        DEAD|     0     |     2     |
-            +-----------+-----------+
-        LIVE|    62     |    127    |
-            +-----------+-----------+
+            +-------+------+
+            | ALIVE | DEAD |
+            +-------+------+
+    COMBO TX|   62  |   0  |
+            +-------+------+
+    S/V MONO|  125  |   2  |
+            +-------+------+
 
     SECONDARY - OVERALL DEATH
-            +-----------+-----------+
-            | SGLT2+S/V | S/V ALONE |
-            +-----------+-----------+
-        DEAD|     0     |     10    |
-            +-----------+-----------+
-        LIVE|    62     |    127    |
-            +-----------+-----------+
+            +-------+------+
+            | ALIVE | DEAD |
+            +-------+------+
+    COMBO TX|   62  |   0  |
+            +-------+------+
+    S/V MONO|  117  |  10  |
+            +-------+------+
     """
-    rate_of_chf_exac = get_fisher_exact_results_as_dict(12, 27, 50, 100)
-    rate_of_cv_death = get_fisher_exact_results_as_dict(0, 2, 62, 127)
-    death_from_any_cause = get_fisher_exact_results_as_dict(0, 10, 62, 127)
+    rate_of_chf_exac = get_fisher_exact_results_as_dict(50, 12, 100, 27)
+    rate_of_cv_death = get_barnard_exact_results_as_dict(62, 0, 125, 2)
+    death_from_any_cause = get_barnard_exact_results_as_dict(62, 0, 117, 10)
+
     return {
         "Sarah": {
             "Rate of CHF exacerbation": rate_of_chf_exac,
@@ -194,7 +210,7 @@ def main():
 
     write_out_results('results.txt', [seth(), sarah(), sean()])
     return
-    
+
 
 if __name__ == "__main__":
     main()

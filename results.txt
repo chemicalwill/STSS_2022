@@ -1,14 +1,14 @@
 Seth
- - Rate of GP contamination:  OR: 2.87,  p-value: 4.01e-08,  95% CI: 1.99 - 4.14, 
- - Rate of ECHO:  OR: 0.23,  p-value: 0.216,  95% CI: 0.03 - 1.76, 
- - Length of stay:  Kruskall-Wallis H statistic: 11.157,  p-value: 8.37e-04, 
+ - Rate of GP contamination: OR 0.35, p-value 4.01e-08, 95% CI 0.24 - 0.51,
+ - Rate of ECHO: OR 4.3, p-value 0.216, 95% CI 0.56 - 32.93,
+ - Length of stay: Kruskall-Wallis H statistic 11.157, p-value 8.37e-04,
 
 Sarah
- - Rate of CHF exacerbation:  OR: 0.89,  p-value: 0.849,  95% CI: 0.42 - 1.9, 
- - Rate of CV death:  OR: 0.0,  p-value: 1.0, 
- - Death from any cause:  OR: 0.0,  p-value: 0.033, 
+ - Rate of CHF exacerbation: OR 1.12, p-value 0.849, 95% CI 0.52 - 2.39,
+ - Rate of CV death: Barnard Exact statistic 0.993, p-value 0.512,
+ - Death from any cause: Barnard Exact statistic 2.27, p-value 0.038,
 
 Sean
- - Premed time:  Kruskall-Wallis H statistic: 54.241,  p-value: 1.77e-13, 
- - OIC chair time:  Kruskall-Wallis H statistic: 6.436,  p-value: 0.011, 
+ - Premed time: Kruskall-Wallis H statistic 54.241, p-value 1.77e-13,
+ - OIC chair time: Kruskall-Wallis H statistic 6.436, p-value 0.011,
 
