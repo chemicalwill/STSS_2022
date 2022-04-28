@@ -9,32 +9,42 @@ import pandas as pd
 from scipy import stats
 
 
+def round_to_3_decimal_or_sci_places(pvalue):
+    if pvalue < 0.001:
+        return "{:0.2e}".format(pvalue)
+    else:
+        return round(pvalue, 3)
+
+
 def get_fisher_exact_results_as_dict(a, b, c, d):
-    
     table = np.array([
         [a, b],
         [c, d]
     ])
-
-    oddsr, pval = stats.fisher_exact(table)
-    oddsr = round(oddsr, 2)
-    if pval < 0.001:
-        pval = "{:0.2e}".format(pval)
-    else:
-        pval = round(pval, 3)
+    odds_ratio, pvalue = stats.fisher_exact(table)
+    odds_ratio = round(odds_ratio, 2)
+    pvalue = round_to_3_decimal_or_sci_places(pvalue)
     
     try:
-        lowerci = np.exp(np.log(oddsr) - 1.96 * sqrt(1/a + 1/b + 1/c + 1/d))
-        upperci = np.exp(np.log(oddsr) + 1.96 * sqrt(1/a + 1/b + 1/c + 1/d))
+        lowerci = np.exp(np.log(odds_ratio) - 1.96 * sqrt(1/a + 1/b + 1/c + 1/d))
+        upperci = np.exp(np.log(odds_ratio) + 1.96 * sqrt(1/a + 1/b + 1/c + 1/d))
         lowerci, upperci = round(lowerci, 2), round(upperci, 2)
     except ZeroDivisionError:
-        lowerci, upperci = None, None
-    finally:
-        return {"OR": oddsr, "p-value": pval, "95% CI": f"{lowerci} - {upperci}"}
+        # lowerci, upperci = None, None
+        return {"OR": odds_ratio, "p-value": pvalue}
+    else:
+        return {"OR": odds_ratio, "p-value": pvalue, "95% CI": f"{lowerci} - {upperci}"}
+        
+
+def get_kruskall_wallis_results_as_dict(df, col1, col2):
+    statistic, pvalue = stats.kruskal(df[col1], df[col2])
+    statistic = round(statistic, 3)
+    pvalue = round_to_3_decimal_or_sci_places(pvalue)
+    return {"statistic": statistic, "p-value": pvalue}
 
 
 # suppress RuntimeWarning for zero division
-#   ex. Sarah's A groups for Fisher Exact have 0 when calculating CI
+#   ex. Sarah's A groups for Fisher's Exact Test div/0 when calculating 95% CI
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 ### SETH ###
@@ -60,15 +70,16 @@ SECONDARY OUTCOME - RATE OF ECHO
 """
 rate_of_gp_contam = get_fisher_exact_results_as_dict(64, 266, 69, 823)
 rate_of_echo = get_fisher_exact_results_as_dict(1, 17, 63, 249)
-length_of_stay = {}
-# TODO LENGTH OF STAY - t-test
-seth_results = {
+"""
+# TODO
+df = pd.read_csv('/path/to/seths/data')
+length_of_stay = get_kruskall_wallis_results_as_dict(df, col1, col2)
+"""
+seths_results = {
     "Rate of GP contamination": rate_of_gp_contam,
     "Rate of ECHO": rate_of_echo,
-    "Length of stay": length_of_stay
+    "Length of stay": {} # length_of_stay
 }
-
-print(pprint.pformat(seth_results))
 
 ### SARAH ###
 """ 
@@ -102,14 +113,20 @@ SECONDARY - OVERALL DEATH
 rate_of_chf_exac = get_fisher_exact_results_as_dict(12, 27, 50, 100)
 rate_of_cv_death = get_fisher_exact_results_as_dict(0, 2, 62, 127)
 death_from_any_cause = get_fisher_exact_results_as_dict(0, 10, 62, 127)
-# TODO secondary change in average SCr @ admit
-sarah_results = {
+sarahs_results = {
     "Rate of CHF exacerbation": rate_of_chf_exac,
     "Rate of CV death": rate_of_cv_death,
     "Death from any cause": death_from_any_cause
 }
-print(pprint.pformat(sarah_results))
+print(pprint.pformat(sarahs_results))
 
 ### SEAN ###
-# TODO avg time from oe_time to combo given - primary (paired/t-test)
-# TODO secondary - total oic time (in hours) (paired/t-test)
+"""
+df = pd.read_csv('/path/to/seans/data') # FIXME
+premed_time = get_kruskall_wallis_results_as_dict(df, col1, col2)
+oic_chair_time = get_kruskall_wallis_results_as_dict(df, col1, col2)
+seans_results = {
+    "Primary endpoint": premed_time,
+    "OIC chair time": oic_chair_time
+}
+"""
