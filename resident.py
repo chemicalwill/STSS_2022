@@ -99,3 +99,12 @@ class Resident:
 
 
 # TODO move normalcy check into paramentric tests, and only throw message if not a normal distribution?
+
+def aggregate_results_dicts_and_write_out_to_file(list_of_Residents, fp):
+    aggregate_dict = {}
+    for Resident in list_of_Residents:
+        aggregate_dict[Resident.name] = Resident.results
+
+    with open(fp, "w") as f:
+        for resident in list_of_Residents:
+            pass

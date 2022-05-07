@@ -2,42 +2,12 @@
 
 import os
 from pathlib import Path
-import warnings
 
 os.chdir(Path(__file__).parent)
 from resident import Resident
 
 
-def write_out_results(fp, results_dict):
-    with open(fp, "w") as f:
-        f.write()
-        for endpoint, result in results_dict.items():
-            pass
-
-"""
-def write_out_results(fp, residents): # FIXME
-    with open(fp, "w") as f:
-        for resident in residents:
-            for name, results in resident.items():
-                f.write(name.title())
-                for endpoint, result in results.items():
-                    f.write(f"\n - {endpoint}:")
-                    for stat, value in result.items():
-                        f.write(f" {stat} {value},")
-                f.write("\n\n")
-    return
-"""
-
-
 def main():
-    os.chdir(Path(__file__).parent)
-    """
-    # suppress RuntimeWarning for zero division
-    #   ex. groups for Fisher's Exact Test div/0 when calculating 95% CI
-    warnings.filterwarnings("ignore", category=RuntimeWarning)
-    # TODO see if this is necessary now that FET += 0.5 if 0
-    """ 
-
     """
     PRIMARY OUTCOME - RATE OF GP CONTAM.
             +------+------+
