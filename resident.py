@@ -90,7 +90,10 @@ class Resident:
         anova_stat, pvalue = stats.f_oneway(group1, group2)
         anova_stat = round(anova_stat, 3)
         pvalue = round_to_3_decimal_or_sci_places(pvalue)
-        self.results[endpoint.title()] = {"One-Way ANOVA": anova_stat, "p-value": pvalue}
+        self.results[endpoint.title()] = {
+            "One-Way ANOVA": anova_stat,
+            "p-value": pvalue,
+        }
 
     def get_t_test_results_as_dict(self, group_col, outcome_value):
         # TODO
@@ -99,6 +102,7 @@ class Resident:
 
 
 # TODO move normalcy check into paramentric tests, and only throw message if not a normal distribution?
+
 
 def aggregate_results_dicts_and_write_out_to_file(list_of_Residents, fp):
     aggregate_dict = {}
