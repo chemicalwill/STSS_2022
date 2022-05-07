@@ -94,16 +94,16 @@ def main():
             +-------+------+
     """
     Sarah = Resident("sarah")
-    Sarah.get_fisher_exact_results_as_dict(50, 12, 100, 27)
-    Sarah.get_barnard_exact_results_as_dict(62, 0, 125, 2)
-    Sarah.get_barnard_exact_results_as_dict(62, 0, 117, 10)
+    Sarah.get_fisher_exact_results_as_dict("chf exacerbations", 50, 12, 100, 27)
+    Sarah.get_barnard_exact_results_as_dict("cv death", 62, 0, 125, 2)
+    Sarah.get_barnard_exact_results_as_dict("death from any cause", 62, 0, 117, 10)
 
     Sean = Resident("sean", "sean_data_cleaned.csv")
-    # all data pulled from spreasheet, no tables to draw
+    # all data pulled from spreadsheet, no tables to draw
     Sean.check_for_normalcy(0.05, "combo_time_delta")
-    Sean.get_kruskall_wallis_results_as_dict("combo_batched_yn", "combo_time_delta")
+    Sean.get_kruskall_wallis_results_as_dict("premed admin time", "combo_batched_yn", "combo_time_delta")
     Sean.check_for_normalcy(0.05, "total_oic_visit_time")
-    Sean.get_kruskall_wallis_results_as_dict("combo_batched_yn", "total_oic_visit_time")
+    Sean.get_kruskall_wallis_results_as_dict("total oic visit time", "combo_batched_yn", "total_oic_visit_time")
 
     return
 

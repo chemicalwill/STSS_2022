@@ -16,7 +16,7 @@ def round_to_3_decimal_or_sci_places(pvalue):
 
 def extract_2_groups_from_df(df, group_col, outcome_value):
     a, b = sorted(df[group_col].unique())
-    a_rows = df.loc[[group_col] == a, outcome_value]
+    a_rows = df.loc[df[group_col] == a, outcome_value]
     b_rows = df.loc[df[group_col] == b, outcome_value]
     return (a_rows, b_rows)
 
@@ -24,8 +24,9 @@ def extract_2_groups_from_df(df, group_col, outcome_value):
 class Resident:
     def __init__(self, residents_name, fp=None):
         self.name = residents_name.title()
-        self.df = pd.read_csv(fp)
         self.results = {}
+        if fp:
+            self.df = pd.read_csv(fp)
 
     def check_for_normalcy(self, alpha, col):
         k2, p = stats.normaltest(self.df[col])
